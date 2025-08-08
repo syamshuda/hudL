@@ -1,0 +1,103 @@
+/* assets/css/style.css - VERSI FINAL */
+@media (min-width: 768px) {
+  body:not(.sidebar-collapsed) .main-content {
+    margin-left: 280px;
+  }
+  body:not(.sidebar-collapsed) .offcanvas-start {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    transform: none;
+    visibility: visible !important;
+  }
+}
+.sidebar-collapsed .offcanvas-start {
+  margin-left: -280px;
+}
+.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+.offcanvas-start, .main-content {
+    transition: margin-left .3s ease-in-out;
+}
+.main-content {
+    position: relative;
+    z-index: 10;
+}
+.offcanvas {
+    z-index: 20;
+}
+@media (min-width: 768px) {
+    .offcanvas-start {
+        z-index: 5;
+    }
+}
+
+/* ================================================== */
+/* ========= GAYA UNTUK FITUR PRINT HALAMAN ========= */
+/* ================================================== */
+
+@media print {
+  /* Sembunyikan semua elemen yang tidak ingin dicetak */
+  .no-print, 
+  .offcanvas, 
+  .navbar, 
+  .breadcrumb,
+  .btn,
+  .alert,
+  .modal-footer {
+    display: none !important;
+  }
+
+  /* Pastikan area yang mau dicetak memenuhi halaman */
+  .printable-area {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  
+  .main-content, .container-fluid {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #dee2e6 !important;
+    padding: 0.5rem;
+    font-size: 10pt;
+  }
+  
+  .table-light {
+    background-color: transparent !important;
+  }
+  
+  .d-print-inline {
+      display: inline !important;
+  }
+
+  .badge {
+      display: none !important;
+  }
+}
+
+/* ================================================== */
+/* ========= GAYA UNTUK UKURAN LOGO SIDEBAR ========= */
+/* ================================================== */
+
+.sidebar-logo {
+  max-width: 95%;
+  height: auto;
+  max-height: 80px;
+}

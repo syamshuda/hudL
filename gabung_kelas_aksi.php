@@ -1,0 +1,77 @@
+<?php
+/**
+ * File: gabung_kelas_aksi.php
+  * Logika untuk memproses permintaan siswa untuk bergabung ke kelas.
+   */
+
+   require_once 'config/koneksi.php';
+
+   // Proteksi halaman, hanya untuk siswa yang sudah login
+   if (!isset($_SESSION['user_id']) || $_SESSION['peran'] != 'siswa') {
+       header("Location: login.php");
+           exit();
+           }
+
+           // Pastikan form disubmit
+           if (isset($_POST['gabung_kelas'])) {
+               $id_siswa = $_SESSION['user_id'];
+                   $kode_kelas_input = sanitize($koneksi, strtoupper($_POST['kode_kelas']));
+
+                       if (empty($kode_kelas_input)) {
+                               header("Location: siswa_dashboard.php"); // Kembali jika input kosong
+                                       exit();
+                                           }
+
+                                               // 1. Cari kelas berdasarkan kode yang diinput
+                                                   $stmt_cari_kelas = $koneksi->prepare("SELECT id FROM kelas WHERE kode_kelas = ?");
+                                                       $stmt_cari_kelas->bind_param("s", $kode_kelas_input);
+                                                           $stmt_cari_kelas->execute();
+                                                               $result_kelas = $stmt_cari_kelas->get_result();
+
+                                                                   if ($result_kelas->num_rows > 0) {
+                                                                           // Kelas ditemukan
+                                                                                   $kelas = $result_kelas->fetch_assoc();
+                                                                                           $id_kelas = $kelas['id'];
+                                                                                                   $stmt_cari_kelas->close();
+
+                                                                                                           // 2. Cek apakah siswa sudah terdaftar di kelas ini sebelumnya
+                                                                                                                   $stmt_cek_pendaftaran = $koneksi->prepare("SELECT id FROM pendaftaran_kelas WHERE id_siswa = ? AND id_kelas = ?");
+                                                                                                                           $stmt_cek_pendaftaran->bind_param("ii", $id_siswa, $id_kelas);
+                                                                                                                                   $stmt_cek_pendaftaran->execute();
+                                                                                                                                           $result_pendaftaran = $stmt_cek_pendaftaran->get_result();
+
+                                                                                                                                                   if ($result_pendaftaran->num_rows > 0) {
+                                                                                                                                                               // Siswa sudah terdaftar
+                                                                                                                                                                           $stmt_cek_pendaftaran->close();
+                                                                                                                                                                                       header("Location: siswa_dashboard.php?status=sudah_terdaftar");
+                                                                                                                                                                                                   exit();
+                                                                                                                                                                                                           } else {
+                                                                                                                                                                                                                       // Siswa belum terdaftar, maka daftarkan
+                                                                                                                                                                                                                                   $stmt_cek_pendaftaran->close();
+                                                                                                                                                                                                                                               $stmt_daftar = $koneksi->prepare("INSERT INTO pendaftaran_kelas (id_siswa, id_kelas) VALUES (?, ?)");
+                                                                                                                                                                                                                                                           $stmt_daftar->bind_param("ii", $id_siswa, $id_kelas);
+                                                                                                                                                                                                                                                                       if ($stmt_daftar->execute()) {
+                                                                                                                                                                                                                                                                                       // Pendaftaran berhasil
+                                                                                                                                                                                                                                                                                                       $stmt_daftar->close();
+                                                                                                                                                                                                                                                                                                                       header("Location: siswa_dashboard.php?status=sukses_gabung");
+                                                                                                                                                                                                                                                                                                                                       exit();
+                                                                                                                                                                                                                                                                                                                                                   } else {
+                                                                                                                                                                                                                                                                                                                                                                   // Gagal insert (error database)
+                                                                                                                                                                                                                                                                                                                                                                                   header("Location: siswa_dashboard.php?status=gagal");
+                                                                                                                                                                                                                                                                                                                                                                                                   exit();
+                                                                                                                                                                                                                                                                                                                                                                                                               }
+                                                                                                                                                                                                                                                                                                                                                                                                                       }
+                                                                                                                                                                                                                                                                                                                                                                                                                           } else {
+                                                                                                                                                                                                                                                                                                                                                                                                                                   // Kelas tidak ditemukan
+                                                                                                                                                                                                                                                                                                                                                                                                                                           $stmt_cari_kelas->close();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                   header("Location: siswa_dashboard.php?status=gagal_kode");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                           exit();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               } else {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   // Jika akses langsung tanpa submit form
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       header("Location: siswa_dashboard.php");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           exit();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           $koneksi->close();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ?>
