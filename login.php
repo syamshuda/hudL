@@ -11,6 +11,9 @@
            if ($peran == 'admin') { header("Location: admin_dashboard.php"); exit(); }
                elseif ($peran == 'guru') { header("Location: guru_dashboard.php"); exit(); }
                    elseif ($peran == 'siswa') { header("Location: siswa_dashboard.php"); exit(); }
+                   elseif ($peran == 'bk') { header("Location: bk_dashboard.php"); exit(); }
+                   elseif ($peran == 'wali_kelas') { header("Location: wali_dashboard.php"); exit(); }
+                   elseif ($peran == 'kurikulum') { header("Location: kurikulum_dashboard.php"); exit(); }
                    }
                    $error = '';
                    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -32,9 +35,12 @@
                                                                                                                                                                $_SESSION['user_id'] = $user['id'];
                                                                                                                                                                                $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
                                                                                                                                                                                                $_SESSION['peran'] = $user['peran'];
-                                                                                                                                                                                                               if ($user['peran'] == 'admin') { header("Location: admin_dashboard.php"); exit(); }
+                                                                                                                                                                                                                                                                                                                                                                                                                                      if ($user['peran'] == 'admin') { header("Location: admin_dashboard.php"); exit(); }
                                                                                                                                                                                                                                elseif ($user['peran'] == 'guru') { header("Location: guru_dashboard.php"); exit(); }
                                                                                                                                                                                                                                                elseif ($user['peran'] == 'siswa') { header("Location: siswa_dashboard.php"); exit(); }
+                                                                                                                                                                                                                                               elseif ($user['peran'] == 'bk') { header("Location: bk_dashboard.php"); exit(); }
+                                                                                                                                                                                                                                               elseif ($user['peran'] == 'wali_kelas') { header("Location: wali_dashboard.php"); exit(); }
+                                                                                                                                                                                                                                               elseif ($user['peran'] == 'kurikulum') { header("Location: kurikulum_dashboard.php"); exit(); }
                                                                                                                                                                                                                                                            }
                                                                                                                                                                                                                                                                    } else {
                                                                                                                                                                                                                                                                                $error = "Login Gagal. Email atau Password salah.";
