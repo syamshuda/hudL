@@ -146,13 +146,14 @@ include_once 'templates/header_admin.php';
                                         <a href="admin_login_as.php?id=<?php echo $user['id']; ?>" class="btn btn-info" onclick="return confirm('Anda akan masuk sebagai <?php echo htmlspecialchars($user['nama_lengkap']); ?>. Lanjutkan?')">
                                             <i class="bi bi-person-bounding-box"></i> Login As
                                         </a>
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editProfilModal" 
-                                            data-user-id="<?php echo $user['id']; ?>" 
-                                            data-user-nama="<?php echo htmlspecialchars($user['nama_lengkap']); ?>" 
-                                            data-user-email="<?php echo htmlspecialchars($user['email']); ?>"
-                                            data-user-nohp="<?php echo htmlspecialchars($user['no_hp'] ?? ''); ?>">
-                                            <i class="bi bi-pencil-fill"></i> Edit
-                                        </button>
+                                                                                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editProfilModal" 
+                                             data-user-id="<?php echo $user['id']; ?>" 
+                                             data-user-nama="<?php echo htmlspecialchars($user['nama_lengkap']); ?>" 
+                                             data-user-email="<?php echo htmlspecialchars($user['email']); ?>"
+                                             data-user-nohp="<?php echo htmlspecialchars($user['no_hp'] ?? ''); ?>"
+                                             data-user-peran="<?php echo htmlspecialchars($user['peran']); ?>">
+                                             <i class="bi bi-pencil-fill"></i> Edit
+                                         </button>
                                         <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#resetPasswordModal" data-id-pengguna="<?php echo $user['id']; ?>" data-nama-pengguna="<?php echo htmlspecialchars($user['nama_lengkap']); ?>">
                                             <i class="bi bi-key-fill"></i> Reset Pass
                                         </button>
@@ -215,25 +216,38 @@ include_once 'templates/header_admin.php';
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="admin_edit_pengguna.php" method="POST">
-                <div class="modal-body">
-                    <input type="hidden" name="id_pengguna_edit" id="id_pengguna_edit_modal">
-                    <div class="mb-3">
-                        <label for="nama_lengkap_edit" class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" name="nama_lengkap_edit" id="nama_lengkap_edit_modal" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email_edit" class="form-label">Alamat Email</label>
-                        <input type="email" class="form-control" name="email_edit" id="email_edit_modal" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="no_hp_edit" class="form-label">Nomor HP</label>
-                        <input type="text" class="form-control" name="no_hp_edit" id="no_hp_edit_modal">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" name="simpan_perubahan_profil" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
+                                 <div class="modal-body">
+                     <input type="hidden" name="id_pengguna_edit" id="id_pengguna_edit_modal">
+                     <div class="mb-3">
+                         <label for="nama_lengkap_edit" class="form-label">Nama Lengkap</label>
+                         <input type="text" class="form-control" name="nama_lengkap_edit" id="nama_lengkap_edit_modal" required>
+                     </div>
+                     <div class="mb-3">
+                         <label for="email_edit" class="form-label">Alamat Email</label>
+                         <input type="email" class="form-control" name="email_edit" id="email_edit_modal" required>
+                     </div>
+                     <div class="mb-3">
+                         <label for="no_hp_edit" class="form-label">Nomor HP</label>
+                         <input type="text" class="form-control" name="no_hp_edit" id="no_hp_edit_modal">
+                     </div>
+                     <div class="mb-3">
+                         <label for="peran_edit" class="form-label">Peran</label>
+                         <select class="form-select" id="peran_edit_modal">
+                           <option value="guru">Guru</option>
+                           <option value="siswa">Siswa</option>
+                           <option value="bk">BK</option>
+                           <option value="wali_kelas">Wali Kelas</option>
+                           <option value="kurikulum">Kurikulum</option>
+                           <option value="admin">Admin</option>
+                         </select>
+                         <div class="form-text">Perubahan peran disimpan terpisah.</div>
+                       </div>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                     <button type="submit" name="simpan_perubahan_profil" class="btn btn-primary">Simpan Perubahan</button>
+                     <button type="button" id="btn-simpan-peran" class="btn btn-outline-primary">Simpan Peran</button>
+                 </div>
             </form>
         </div>
     </div>
@@ -263,12 +277,28 @@ document.addEventListener('DOMContentLoaded', function () {
             const userName = button.getAttribute('data-user-nama');
             const userEmail = button.getAttribute('data-user-email');
             const userNoHp = button.getAttribute('data-user-nohp');
+            const userRole = button.getAttribute('data-user-peran');
             
             editProfilModal.querySelector('.modal-title').textContent = 'Edit Profil: ' + userName;
             editProfilModal.querySelector('#id_pengguna_edit_modal').value = userId;
             editProfilModal.querySelector('#nama_lengkap_edit_modal').value = userName;
             editProfilModal.querySelector('#email_edit_modal').value = userEmail;
             editProfilModal.querySelector('#no_hp_edit_modal').value = userNoHp;
+            const roleSelect = editProfilModal.querySelector('#peran_edit_modal');
+            if (roleSelect) roleSelect.value = userRole;
+
+            const btnSimpanPeran = editProfilModal.querySelector('#btn-simpan-peran');
+            if (btnSimpanPeran) {
+                btnSimpanPeran.onclick = function() {
+                    const formData = new FormData();
+                    formData.append('id_pengguna', userId);
+                    formData.append('peran_baru', roleSelect.value);
+                    fetch('admin_set_role.php', { method: 'POST', body: formData })
+                        .then(r => { if (!r.ok) throw new Error('error'); return r.text(); })
+                        .then(() => { window.location.href = 'admin_dashboard.php?status=sukses_edit'; })
+                        .catch(() => { window.location.href = 'admin_dashboard.php?status=gagal_edit'; });
+                };
+            }
         });
     }
 
